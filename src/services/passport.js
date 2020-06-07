@@ -1,23 +1,20 @@
-//lets import some stuff
 import passport from 'passport';
 import LocalStrategy from 'passport-local';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 
-// and import User
 import User from '../models/user_model';
 
 // options for local strategy, we'll use email AS the username
-// not have separate ones
 const localOptions = { usernameField: 'email' };
 
 // options for jwt strategy
 // we'll pass in the jwt in an `authorization` header
 // so passport can find it there
 const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromHeader('authorization'),
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: process.env.AUTH_SECRET,
 };
-// NOTE: we are not calling this a bearer token (although it technically is), if you see people use Bearer in front of token on the internet you could either ignore it, use it but then you have to parse it out here as well as prepend it on the frontend.
+
 
 // username + password authentication strategy
 const localLogin = new LocalStrategy(localOptions, (email, password, done) => {
