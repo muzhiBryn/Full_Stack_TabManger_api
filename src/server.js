@@ -4,10 +4,11 @@ import cors from 'cors';
 import path from 'path';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
+import apiRouter from './router';
 
 // DB Setup
-const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/2many';
-mongoose.connect(mongoURI);
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/_2many';
+mongoose.connect(mongoURI, { useNewUrlParser: true });
 // set mongoose promises to es6 default
 mongoose.Promise = global.Promise;
 
@@ -19,6 +20,9 @@ app.use(cors());
 
 // enable/disable http request logging
 app.use(morgan('dev'));
+
+// disable 304
+app.disable('etag');
 
 // enable only if you want templating
 app.set('view engine', 'ejs');
@@ -32,6 +36,10 @@ app.set('views', path.join(__dirname, '../src/views'));
 // enable json message body for posting data to API
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use('/api', apiRouter);
+
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 // additional init stuff should go before hitting the routing
 
