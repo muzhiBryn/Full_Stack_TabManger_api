@@ -3,12 +3,13 @@ import bcrypt from 'bcryptjs';
 import Project from './project_model';
 
 const UserSchema = new Schema({
-  username: {
+  email: {
     type: String,
     unique: true,
     lowercase: true,
   },  
-  projects: [Project],
+  userName: String,
+  projects: Array,
   password: {
     type: String,
   }

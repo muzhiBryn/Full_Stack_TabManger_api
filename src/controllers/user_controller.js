@@ -12,23 +12,25 @@ function tokenForUser(user) {
 }
 
 export const signin = (req, res, next) => {
-  res.send({ token: tokenForUser(req.user) });
+  res.send({ token: tokenForUser(req.user), userName: req.user.userName });
 }
 
 export const signup = (req, res, next) => {
-  const username = req.body.username;
+  const userName = req.body.userName;
+  const email = req.body.email
   const password = req.body.password;
 
-  if (!username || !password) {
+  if (!email || !password) {
     return res.status(422).send('You must provide email and password');
   } else {
-    User.find({ username: username })
+    User.find({ email: email })
     .then((result) => {
       if (result.length > 0) {
-        res.status(409).json({ message: 'Username already exists', result });
+        res.status(409).json({ message: 'Email already exists', result });
       } else {
         const newUser = new User();
-        newUser.username = username;
+        newUser.email = email
+        newUser.userName = userName;
         newUser.password = password;
 
         newUser.save()

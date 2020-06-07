@@ -4,6 +4,7 @@ import cors from 'cors';
 import path from 'path';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
+import apiRouter from './router';
 
 // DB Setup
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost/2many';
@@ -34,6 +35,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // additional init stuff should go before hitting the routing
+app.use('/api', apiRouter);
 
 // default index route
 app.get('/', (req, res) => {
@@ -42,7 +44,7 @@ app.get('/', (req, res) => {
 
 // START THE SERVER
 // =============================================================================
-const port = process.env.PORT || 9090;
+const port = process.env.PORT || 8080;
 app.listen(port);
 
 console.log(`listening on: ${port}`);

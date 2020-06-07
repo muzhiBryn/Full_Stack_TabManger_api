@@ -6,7 +6,7 @@ const ProjectSchema = new Schema({
 // We can add authors (users) later if we want with this line:
 //   author: { type: Schema.Types.ObjectId, ref: 'User' },
   title: String,
-  tabs: [Tab],
+  tabs: Array,
   notes: String,
   // To determine what order to display tabs; this can work as an upvote-esque feature
   priority: {type: Number, default: 0 },
