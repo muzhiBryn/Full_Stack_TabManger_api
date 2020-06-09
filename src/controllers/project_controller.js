@@ -2,7 +2,8 @@ import Project from '../models/project_model';
 import * as Tabs from './tab_controller';
 
 export const getProjects = (req, res) => {
-  Project.find()
+  const user = req.user.id;
+  Project.find({user})
     .then((results) => {
       res.json(results.map((result) => { return (result.projectName); }));
     })
@@ -12,8 +13,10 @@ export const getProjects = (req, res) => {
 };
 
 export const createProject = (req, res) => {
+  project.user = req.user.id;
   const project = new Project();
   project.projectName = req.body.projectName;
+  project.user = req.user.id;
   project.save()
     .then(() => {
       getProjects(req, res);
@@ -25,7 +28,8 @@ export const createProject = (req, res) => {
 
 export const getProject = (req, res) => {
   const { projectName } = req.params;
-  Project.findOne({ projectName })
+  const user = req.user.id;
+  Project.findOne({ projectName, user })
     .then((result) => {
       console.log(result);
       const project = { projectName, projectNote: result.note, resources: {} };
@@ -58,7 +62,8 @@ export const getProject = (req, res) => {
 // };
 
 export const deleteProject = (req, res) => {
-  Project.findOneAndDelete({ projectName: req.params.projectName })
+  const user = req.user.id;
+  Project.findOneAndDelete({ projectName: req.params.projectName, user })
     .then(() => {
       Project.find()
         .then((results) => {
@@ -72,17 +77,19 @@ export const deleteProject = (req, res) => {
 
 export const mergeProjects = async (req, res) => {
   let flag = 1;
+  const user = req.user.id;
   await req.body.forEach((project) => {
-    Project.findOne({ projectName: project.projectName })
+    Project.findOne({ projectName: project.projectName, user })
       .then((result) => {
         if (!result) {
           const _project = new Project();
           _project.projectName = project.projectName;
           _project.note = project.projectNote;
+          _project.user = user;
           _project.tabs = [];
           Object.values(project.resources).forEach((resource) => {
             Tabs.createTab({ resource, parent: project.projectName }).then((updatedTab) => {
-              console.log(updatedTab);
+              // console.log(updatedTab);
             });
           });
           _project.save();
@@ -90,7 +97,7 @@ export const mergeProjects = async (req, res) => {
           result.note = result.note || project.projectNote;
           Object.values(project.resources).forEach((resource) => {
             Tabs.updateTab({ resource, parent: project.projectName }).then((updatedTab) => {
-              console.log(updatedTab);
+              // console.log(updatedTab);
             });
           });
           result.save();
@@ -106,7 +113,8 @@ export const mergeProjects = async (req, res) => {
 
 export const updateProject = (req, res) => {
   const { projectName, projectNote } = req.body;
-  Project.findOneAndUpdate({ projectName: req.params.projectName }, { projectName, note: projectNote }, { new: true })
+  const user = req.user.id;
+  Project.findOneAndUpdate({ projectName: req.params.projectName, user }, { projectName, note: projectNote }, { new: true })
     .then((curProj) => {
       const currentProject = {
         projectName: curProj.projectName,
@@ -136,7 +144,8 @@ export const updateProject = (req, res) => {
 export const deleteResources = (req, res) => {
   const { projectName } = req.params;
   const urls = req.body;
-  Project.findOne({ projectName }).then((project) => {
+  const user = req.user.id;
+  Project.findOne({ projectName, user }).then((project) => {
     // eslint-disable-next-line no-restricted-syntax
     urls.forEach((url) => {
       // eslint-disable-next-line no-await-in-loop
@@ -153,10 +162,11 @@ export const deleteResources = (req, res) => {
 export const newResources = (req, res) => {
   const { projectName } = req.params;
   const resources = req.body;
-  Project.findOne({ projectName }).then((project) => {
+  const user = req.user.id;
+  Project.findOne({ projectName, user }).then((project) => {
     Object.values(resources).forEach((resource) => {
       Tabs.createTab({ resource, parent: project.id }).then((newTab) => {
-        console.log(newTab);
+        // console.log(newTab);
         Tabs.getTabs({ parent: project.id }).then((tabs) => {
           const _project = { projectName: project.projectName, projectNote: project.note };
           _project.resources = {};
@@ -178,9 +188,10 @@ export const newResources = (req, res) => {
 };
 
 export const updateResource = (req, res) => {
+  const user = req.user.id;
   const { projectName } = req.params;
   const updatedResource = req.body;
-  Project.findOne({ projectName }).then((project) => {
+  Project.findOne({ projectName, user }).then((project) => {
     Tabs.updateTab({ fields: updatedResource, parent: project.id }).then((updatedTab) => {
       console.log(updatedTab);
       res.json(updatedTab);

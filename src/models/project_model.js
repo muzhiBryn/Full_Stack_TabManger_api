@@ -4,7 +4,7 @@ import mongoose, { Schema } from 'mongoose';
 // create a ModelSchema with a projectName field
 const ProjectSchema = new Schema({
 // We can add authors (users) later if we want with this line:
-//   author: { type: Schema.Types.ObjectId, ref: 'User' },
+  user: { type: Schema.Types.ObjectId, ref: 'User' },
   projectName: String,
   note: String,
   // tabs: Array,
