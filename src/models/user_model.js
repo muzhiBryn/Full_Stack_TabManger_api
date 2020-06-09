@@ -8,7 +8,6 @@ const UserSchema = new Schema({
     lowercase: true,
   },  
   userName: String,
-  projects: Array,
   password: {
     type: String,
   }
