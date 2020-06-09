@@ -47,5 +47,7 @@ export const signup = (req, res, next) => {
 };
 
 export const check = (req, res, next) => {
-  res.send({ msg: 'Has logged in' });
+  const user = JSON.parse(JSON.stringify(req.user));
+  console.log(user);
+  res.send({ msg: 'Has logged in', userName: user.userName });
 };

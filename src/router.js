@@ -9,7 +9,9 @@ router.get('/', (req, res) => {
   res.json({ message: 'welcome to 2 Many Tabz api!' });
 });
 
-router.post('/signin', requireSignin, UserController.signin);
+router.route('/signin')
+  .post(requireSignin, UserController.signin)
+  .get(requireAuth, UserController.check);
 router.post('/signup', UserController.signup);
 
 // requireAuth,
