@@ -13,7 +13,6 @@ export const getProjects = (req, res) => {
 };
 
 export const createProject = (req, res) => {
-  project.user = req.user.id;
   const project = new Project();
   project.projectName = req.body.projectName;
   project.user = req.user.id;
