@@ -8,7 +8,7 @@ export const createTab = (req) => {
   _tab.tags = resource.tags || [];
   _tab.icon = resource.icon || '';
   _tab.parent = parent;
-  console.log(_tab);
+  // console.log(_tab);
   return new Promise((resolve, reject) => {
     _tab.save()
       .then((result) => {

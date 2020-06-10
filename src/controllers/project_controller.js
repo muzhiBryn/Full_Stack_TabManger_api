@@ -85,7 +85,7 @@ export const mergeProjects = async (req, res) => {
           _project.note = project.projectNote;
           _project.user = user;
           Object.values(project.resources).forEach((resource) => {
-            Tabs.createTab({ resource, parent: result.id }).then((updatedTab) => {
+            Tabs.createTab({ resource, parent: _project.id }).then((updatedTab) => {
               // console.log(updatedTab);
             });
           });
@@ -146,19 +146,17 @@ export const deleteResources = (req, res) => {
   const { projectName } = req.params;
   const urls = req.body;
   const user = req.user.id;
-  const promises = Project.findOne({ projectName, user }).then((project) => {
-    // eslint-disable-next-line no-restricted-syntax
-    urls.forEach((url) => {
-      // eslint-disable-next-line no-await-in-loop
-      Tabs.deleteTab({ parent: project.id, url }).then(() => {
+  Project.findOne({ projectName, user }).then((project) => {
+    const promises = urls.map((url) => {
+      return Tabs.deleteTab({ parent: project.id, url }).then(() => {
         console.log(`Successfully deleted ${url}`);
       });
     });
+    Promise.all(promises).then(() => {
+      getProject(req, res);
+    });
   }).catch((error) => {
     res.status(500).json({ error });
-  });
-  Promise.all(promises).then(() => {
-    getProject(req, res);
   });
 };
 
@@ -167,23 +165,25 @@ export const newResources = async (req, res) => {
   const resources = req.body;
   const user = req.user.id;
   Project.findOne({ projectName, user }).then((project) => {
-    Object.values(resources).forEach((resource) => {
-      Tabs.createTab({ resource, parent: project.id }).then((newTab) => {
+    const promises = Object.values(resources).map((resource) => {
+      return Tabs.createTab({ resource, parent: project.id }).then((newTab) => {
         // console.log(newTab);
       });
     });
-    Tabs.getTabs({ parent: project.id }).then((tabs) => {
-      const _project = { projectName: project.projectName, projectNote: project.note };
-      _project.resources = {};
-      tabs.forEach((tab) => {
-        _project.resources[tab.url] = {
-          url: tab.url,
-          title: tab.title,
-          icon: tab.icon,
-          tags: tab.tags,
-        };
-      });
+    Promise.all(promises).then(() => {
+      Tabs.getTabs({ parent: project.id }).then((tabs) => {
+        const _project = { projectName: project.projectName, projectNote: project.note };
+        _project.resources = {};
+        tabs.forEach((tab) => {
+          _project.resources[tab.url] = {
+            url: tab.url,
+            title: tab.title,
+            icon: tab.icon,
+            tags: tab.tags,
+          };
+        });
       res.json(_project);
+      })
     });
   }).catch((error) => {
     res.status(500).json({ error });
@@ -195,8 +195,8 @@ export const updateResource = (req, res) => {
   const { projectName } = req.params;
   const updatedResource = req.body;
   Project.findOne({ projectName, user }).then((project) => {
-    Tabs.updateTab({ fields: updatedResource, parent: project.id }).then((updatedTab) => {
-      console.log(updatedTab);
+    Tabs.updateTab({ resource: updatedResource, parent: project.id }).then((updatedTab) => {
+      // console.log(updatedTab);
       res.json(updatedTab);
     });
   }).catch((error) => {

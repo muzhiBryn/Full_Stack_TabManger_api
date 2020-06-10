@@ -8,10 +8,7 @@ const TabSchema = new Schema({
     type: String,
     required: true,
   },
-  parent: {
-    type: String,
-    required: true,
-  },
+  parent: { type: Schema.Types.ObjectId, ref: 'Project' },
   title: String,
   tags: Array,
   icon: String,
