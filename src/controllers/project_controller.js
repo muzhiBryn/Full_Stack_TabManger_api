@@ -158,7 +158,7 @@ export const deleteResources = (req, res) => {
   });
 };
 
-export const newResources = (req, res) => {
+export const newResources = async (req, res) => {
   const { projectName } = req.params;
   const resources = req.body;
   const user = req.user.id;
@@ -166,20 +166,20 @@ export const newResources = (req, res) => {
     Object.values(resources).forEach((resource) => {
       Tabs.createTab({ resource, parent: project.id }).then((newTab) => {
         // console.log(newTab);
-        Tabs.getTabs({ parent: project.id }).then((tabs) => {
-          const _project = { projectName: project.projectName, projectNote: project.note };
-          _project.resources = {};
-          tabs.forEach((tab) => {
-            _project.resources[tab.url] = {
-              url: tab.url,
-              title: tab.title,
-              icon: tab.icon,
-              tags: tab.tags,
-            };
-          });
-          res.json(_project);
-        });
       });
+    });
+    Tabs.getTabs({ parent: project.id }).then((tabs) => {
+      const _project = { projectName: project.projectName, projectNote: project.note };
+      _project.resources = {};
+      tabs.forEach((tab) => {
+        _project.resources[tab.url] = {
+          url: tab.url,
+          title: tab.title,
+          icon: tab.icon,
+          tags: tab.tags,
+        };
+      });
+      res.json(_project);
     });
   }).catch((error) => {
     res.status(500).json({ error });
