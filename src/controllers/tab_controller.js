@@ -36,7 +36,7 @@ export const getTabs = (req) => {
 export const deleteTab = (req) => {
   const { parent, url } = req;
   return new Promise((resolve, reject) => {
-    Tab.findOneAndDelete({ parent, url })
+    Tab.findOneAndDelete({ parent, url }, {useFindAndModify:false })
       .then((result) => {
         resolve(result);
       })
@@ -47,12 +47,12 @@ export const deleteTab = (req) => {
 };
 
 export const updateTab = (req) => {
-  const { fields, parent } = req;
+  const { resource, parent } = req;
   return new Promise((resolve, reject) => {
-    Tab.findOneAndUpdate({ parent, url: fields.url }, fields, { new: true })
+    Tab.findOneAndUpdate({ parent, url: resource.url }, resource, { new: true, useFindAndModify:false })
       .then((result) => {
         if (!result) {
-          createTab({ resource: fields, parent })
+          createTab({ resource, parent })
             .then((res) => {
               resolve(res);
             });
