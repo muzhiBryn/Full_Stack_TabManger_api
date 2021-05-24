@@ -2,10 +2,7 @@
 
 # 2 Many Tabz
 
-![Team Photo](./selfie.png)
-[*how?*](https://help.github.com/articles/about-readmes/#relative-links-and-image-paths-in-readme-files)
 
-TODO: short project description, some sample screenshots or mockups
 
 ## Architecture
 
